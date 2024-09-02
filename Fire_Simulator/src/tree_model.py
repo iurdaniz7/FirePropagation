@@ -19,6 +19,7 @@ class Tree(Agent):
         self.current_time_on_fire = 0
         self.step_count = model.step_count
         self.color = "green"
+        self.burning_value = 0
 
     def calculate_heat_intensity(self, source, target, wind_strength, wind_direction):
 
@@ -43,23 +44,25 @@ class Tree(Agent):
         # Calculate the final heat intensity
         intensity = wind_strength * distance_decay * angular_influence
 
-        return intensity
+        return intensity/10
 
     def step(self):
 
         self.step_count = self.model.step_count
 
         if self.is_burned:
+            self.burning_value = self.current_time_on_fire + 1
             return
 
         if self.on_fire:
 
             self.current_time_on_fire += 1
+            self.burning_value = self.current_time_on_fire
 
             if self.current_time_on_fire < 2:
-                self.color = "yellow"
-            elif self.current_time_on_fire < 4:
                 self.color = "orange"
+            elif self.current_time_on_fire < 4:
+                self.color = "red"
             else:
                 self.color = "red"
 
