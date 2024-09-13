@@ -29,11 +29,7 @@ class ForestArea:
             self.number_of_trees += area_in_square_meters * tree_group["tree_density_m"]
             self.trees_properties.append(tree_group)
 
-        # area_centroids = self.get_centroids(polygon=area["area"],
-        #                                    n=math.ceil(math.sqrt(int(self.number_of_trees / trees_per_agent))),
-        #                                    m=math.ceil(math.sqrt(int(self.number_of_trees / trees_per_agent))))
-
-        area_centroids = self.get_random_agent_location(polygon=area["area"],
+        area_centroids = self.set_random_agent_location(polygon=area["area"],
                                                         n=math.ceil(self.number_of_trees / trees_per_agent))
 
         self.tree_agents = list()
@@ -78,7 +74,7 @@ class ForestArea:
         return centroids
 
     @staticmethod
-    def get_random_agent_location(polygon, n):
+    def set_random_agent_location(polygon, n):
 
         minx, miny, maxx, maxy = polygon.bounds
 

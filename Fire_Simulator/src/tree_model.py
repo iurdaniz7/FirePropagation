@@ -1,6 +1,9 @@
 from mesa import Agent
 import math
 import random
+from geopy.distance import geodesic
+from shapely.geometry import Point
+from pyproj import Transformer
 
 
 class Tree(Agent):
@@ -19,12 +22,16 @@ class Tree(Agent):
         self.current_time_on_fire = 0
         self.step_count = model.step_count
         self.color = "green"
-        self.burning_value = 0
+        self.burning_value = 0.01
 
-    def calculate_heat_intensity(self, source, target, wind_strength, wind_direction):
+    @staticmethod
+    def calculate_heat_intensity(source, target, wind_strength, wind_direction):
 
-        # Distance between source and target
-        distance = source.distance(target)
+        s = (source.y, source.x)
+        t = (target.y, target.x)
+
+        # Calculate the geodesic distance between the two points
+        distance = geodesic(s, t).meters
 
         # Calculate direction from source to target
         dx = target.x - source.x
@@ -35,29 +42,37 @@ class Tree(Agent):
         angle_diff = (wind_direction - angle_to_target + 360) % 360
         angle_diff = min(angle_diff, 360 - angle_diff)
 
-        # Model heat intensity decay
-        distance_decay = math.exp(-distance / wind_strength)
+        # Constants
+        base_intensity = 10000  # Base intensity in W/m^2 (arbitrary unit for initial fire strength)
+        humidity_factor = 1 - (50 / 100)  # Fire intensity decreases with higher humidity
+        temperature_factor = 1 + (20 - 20) / 100  # Adjust intensity based on temperature (20°C as baseline)
+        wind_factor = 1 + (wind_strength / 10)  # Wind increases the spread and intensity of fire
+        distance_factor = math.exp(-distance/50)  # Heat intensity decreases exponentially with distance
 
-        # Model angular influence (higher intensity in wind direction)
+        # Angular influence (higher intensity in wind direction)
         angular_influence = max(0, math.cos(math.radians(angle_diff)))
 
-        # Calculate the final heat intensity
-        intensity = wind_strength * distance_decay * angular_influence
+        # Area size influence (larger areas on fire will have a more significant impact)
+        # area_factor = math.sqrt(area_size / 1000)
 
-        return intensity/10
+        # Calculate the final heat intensity
+        heat_intensity = (base_intensity * humidity_factor * temperature_factor * wind_factor *
+                          distance_factor * angular_influence)
+
+        return heat_intensity
 
     def step(self):
 
         self.step_count = self.model.step_count
 
         if self.is_burned:
-            self.burning_value = self.current_time_on_fire + 1
+            self.burning_value = 1
             return
 
         if self.on_fire:
 
             self.current_time_on_fire += 1
-            self.burning_value = self.current_time_on_fire
+            self.burning_value = 0.1
 
             if self.current_time_on_fire < 2:
                 self.color = "orange"
@@ -80,12 +95,13 @@ class Tree(Agent):
                                                        target=this_tree.location,
                                                        wind_strength=self.model.wind_conditions["speed"],
                                                        wind_direction=self.model.wind_conditions["direction"])
-                         for this_tree in self.model.schedule.agents if this_tree.on_fire]
+                         for this_tree in self.model.schedule.agents if (this_tree.on_fire and
+                                                                         this_tree.current_time_on_fire > 0)]
 
             if sum(intensity) < 30:
                 probability = 0
-            elif sum(intensity) < 100:
-                probability = 0.9 * sum(intensity)/100
+            elif sum(intensity) < 12000:
+                probability = 0.8 * sum(intensity)/12000
             else:
                 probability = 0.9
 

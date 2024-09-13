@@ -12,7 +12,7 @@ from shapely.affinity import scale
 import re
 
 
-custom_color_scale = [[0.0, "green"], [0.1, "yellow"], [0.3, "orange"], [0.4, "red"], [1.0, "black"]]
+custom_color_scale = [[0.0, "green"], [0.05, "green"], [0.1, "red"], [1.0, "black"]]
 
 # Sample DataFrame with Shapely Points
 data = pd.DataFrame({
@@ -31,91 +31,76 @@ app = dash.Dash(__name__)
 # Define the layout of the app
 app.layout = html.Div([
     html.Div([
-        # Left-hand side (35% width)
+        # Left-hand side (30% width)
         html.Div([
-
-            # Metrics
+            # Left Panel (Unified panel with faded background and rounded edges)
             html.Div([
-                html.H3("Simulation Setup", style={'font-family': 'Georgia', 'margin-bottom': '12px'}),
+                # Metrics
+                html.H3("Simulation Setup", style={'font-family': 'Georgia', 'margin-bottom': '12px', 'color': '#005f73'}),
                 html.Div([
                     # Row 1
                     html.Div([
                         html.Div([
-                            html.H6("Wind Speed (m/s)", style={'text-align': 'left', 'margin-top': '5px',
-                                                               'margin-bottom': '5px'}),
-                            dcc.Input("80", id="wind-speed", style={'font-size': '12px', 'text-align': 'left'})
-                        ], style={'width': '50%',  "height": "20px", 'display': 'inline-block'}),
+                            html.H6("Wind Speed (m/s)", style={'text-align': 'left', 'margin-top': '5px', 'margin-bottom': '5px', 'color': '#003845'}),
+                            dcc.Input("80", id="wind-speed", style={'font-size': '12px', 'text-align': 'left', 'border': '1px solid #d4d4d4', 'border-radius': '5px', 'padding': '5px'})
+                        ], style={'width': '50%', 'display': 'inline-block'}),
                         html.Div([
-                            html.H6("Wind Direction (º)", style={'text-align': 'left', 'margin-top': '5px',
-                                                                 'margin-bottom': '5px'}),
-                            dcc.Input("45", id="wind-direction", style={'font-size': '12px', 'text-align': 'left'})
-                        ], style={'width': '50%',  "height": "20px", 'display': 'inline-block'})
-                    ], style={'width': '100%'}),
+                            html.H6("Wind Direction (º)", style={'text-align': 'left', 'margin-top': '5px', 'margin-bottom': '5px', 'color': '#003845'}),
+                            dcc.Input("45", id="wind-direction", style={'font-size': '12px', 'text-align': 'left', 'border': '1px solid #d4d4d4', 'border-radius': '5px', 'padding': '5px'})
+                        ], style={'width': '50%', 'display': 'inline-block'})
+                    ], style={'width': '100%', 'margin-bottom': '10px'}),
+
                     # Row 2
                     html.Div([
-
                         html.Div([
-                            html.H6("Humidity (%)", style={'text-align': 'left', 'margin-top': '5px',
-                                                           'margin-bottom': '5px'}),
-                            dcc.Input("60", id="humidity", style={'font-size': '12px',
-                                                                  'text-align': 'left',
-                                                                  'margin-top': '10px'})
+                            html.H6("Humidity (%)", style={'text-align': 'left', 'margin-top': '5px', 'margin-bottom': '5px', 'color': '#003845'}),
+                            dcc.Input("60", id="humidity", style={'font-size': '12px', 'text-align': 'left', 'border': '1px solid #d4d4d4', 'border-radius': '5px', 'padding': '5px'})
                         ], style={'width': '50%', 'display': 'inline-block'}),
-
                         html.Div([
-                            html.H6("Temperature (C)", style={'text-align': 'left', 'margin-top': '5px',
-                                                              'margin-bottom': '5px'}),
-                            dcc.Input("24", id="temperature", style={'font-size': '12px',
-                                                                     'text-align': 'left',
-                                                                     'margin-top': '10px'})
+                            html.H6("Temperature (C)", style={'text-align': 'left', 'margin-top': '5px', 'margin-bottom': '5px', 'color': '#003845'}),
+                            dcc.Input("24", id="temperature", style={'font-size': '12px', 'text-align': 'left', 'border': '1px solid #d4d4d4', 'border-radius': '5px', 'padding': '5px'})
                         ], style={'width': '50%', 'display': 'inline-block'})
-
                     ], style={'width': '100%'})
-
                 ], style={'display': 'flex', 'flex-wrap': 'wrap'}),
-            ], style={'display': 'inline-block', 'vertical-align': 'top'}),
 
-            # Tables
-            html.Div([
-
-                html.H6("Define forest areas", style={'font-family': 'Georgia', 'margin-bottom': '12px'}),
-
-                html.Button('Add Area', id='area-button', n_clicks=0,
-                            style={'margin-top': '12px', 'font-family': 'Georgia'}),
-
+                # Tables Section
+                html.H6("Define Forest Areas", style={'font-family': 'Georgia', 'margin-bottom': '12px', 'color': '#005f73'}),
+                html.Button('Add Area', id='area-button', n_clicks=0, style={'background-color': '#76c7c0', 'color': 'white', 'border': 'none', 'border-radius': '5px', 'padding': '8px 12px', 'font-family': 'Arial'}),
                 dcc.Graph(id="area-table", figure=go.Figure(data=[go.Table(
-                    header=dict(values=["Area Name", "Properties"], fill_color='paleturquoise', align='left'),
+                    header=dict(values=["Area Name", "Properties"], fill_color='#76c7c0', align='left', font=dict(color='white', size=12)),
                     cells=dict(values=[], fill_color='lavender', align='left'))
                 ]).update_layout(margin=dict(l=0, r=0, t=5, b=0)),
-                          style={"width": "100%", 'padding': '0px', "align": "left", "height": "100px"}),
+                          style={"width": "90%", 'padding': '0px', 'align': 'left', 'height': '100px', 'border-radius': '8px', 'border': '1px solid #76c7c0'}),
 
-                html.H6("Define fire start areas", style={'font-family': 'Georgia', 'margin-bottom': '12px'}),
-
-                html.Button('Add fire', id='fire-button', n_clicks=0,
-                            style={'margin-top': '12px', 'font-family': 'Georgia'}),
-
+                html.H6("Define Fire Start Areas", style={'font-family': 'Georgia', 'margin-bottom': '12px', 'color': '#005f73'}),
+                html.Button('Add Fire', id='fire-button', n_clicks=0, style={'background-color': '#76c7c0', 'color': 'white', 'border': 'none', 'border-radius': '5px', 'padding': '8px 12px', 'font-family': 'Arial'}),
                 dcc.Graph(id="fire-table", figure=go.Figure(data=[go.Table(
-                    header=dict(values=["Area Name", "Properties"], fill_color='paleturquoise', align='left'),
+                    header=dict(values=["Area Name", "Properties"], fill_color='#76c7c0', align='left', font=dict(color='white', size=12)),
                     cells=dict(values=[], fill_color='lavender', align='left'))
                 ]).update_layout(margin=dict(l=0, r=0, t=5, b=0)),
-                          style={"width": "100%", 'padding': '0px', "align": "left", "height": "100px"}),
+                          style={"width": "90%", 'padding': '0px', 'align': 'left', 'height': '100px', 'border-radius': '8px', 'border': '1px solid #76c7c0'}),
 
+                # Run Simulation Button
                 html.Button('Run Simulation', id='run-button', n_clicks=0,
-                            style={"width": "100%", 'margin-top': '12px', 'font-family': 'Georgia', "align": "left"})
-            ], style={'display': 'inline-block', 'vertical-align': 'top', "width": "100%"})
+                            style={"width": "90%", 'margin-top': '12px', 'background-color': '#0077b6',
+                                   'color': 'white', 'border': 'none', 'border-radius': '5px', 'padding': '10px',
+                                   'font-family': 'Arial', 'box-shadow': '0 4px 6px rgba(0, 0, 0, 0.1)'})
 
-        ], style={'width': '40%', 'display': 'inline-block', 'vertical-align': 'top'}),
+            ], style={
+                'padding': '20px', 'border-radius': '15px', 'background-color': 'rgba(220, 240, 255, 0.6)',
+                'box-shadow': '0 4px 6px rgba(0, 0, 0, 0.1)',
+                'width': '100%', 'display': 'inline-block', 'vertical-align': 'top'
+            })
 
-        # Right-hand side (65% width)
+        ], style={'width': '30%', 'display': 'inline-block', 'vertical-align': 'top'}),
+
+        # Right-hand side (70% width)
         html.Div([
-
-            html.H3("Results", style={'font-family': 'Georgia', 'margin-bottom': '12px'}),
+            html.H3("Results", style={'font-family': 'Georgia', 'margin-bottom': '12px', 'color': '#005f73'}),
 
             # Time slider and play button below the map
             html.Div([
-                html.Button('Play', id='play-button', n_clicks=0,
-                            style={'margin-right': '10px', 'font-family': 'Georgia'}),
-
+                html.Button('Play', id='play-button', n_clicks=0, style={'background-color': '#0077b6', 'color': 'white', 'border': 'none', 'border-radius': '5px', 'padding': '10px', 'font-family': 'Arial', 'margin-right': '10px'}),
                 html.Div([
                     dcc.Slider(
                         id='time-slider',
@@ -128,34 +113,51 @@ app.layout = html.Div([
                         updatemode='drag',
                         included=True
                     )], style={"width": "100%"}),
-                dcc.Interval(id='interval-component', interval=1*1000, n_intervals=0, disabled=True)],
-                style={'display': 'flex', 'align-items': 'center', 'justify-content': 'space-between', 'margin-top': '12px'}),
+                dcc.Interval(id='interval-component', interval=1*1000, n_intervals=0, disabled=True)
+            ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'space-between', 'margin-top': '12px'}),
 
-            # First section on the right-hand side (60% height)
+            # Value Panels
+            html.Div([
+                html.Div([
+                    html.H6("Burned Area (Km^2)", style={'color': '#003845'}),
+                    html.P(id='area-panel', children="80", style={'font-size': '15px', 'font-weight': 'bold', 'color': '#76c7c0'})
+                ], style={'width': '25%', 'text-align': 'center', 'display': 'inline-block'}),
+
+                html.Div([
+                    html.H6("Est. Burned Trees (K)", style={'color': '#003845'}),
+                    html.P(id='burned-panel', children="45", style={'font-size': '15px', 'font-weight': 'bold', 'color': '#76c7c0'})
+                ], style={'width': '25%', 'text-align': 'center', 'display': 'inline-block'}),
+
+                html.Div([
+                    html.H6("Fire Time (min)", style={'color': '#003845'}),
+                    html.P(id='time-panel', children="1", style={'font-size': '15px', 'font-weight': 'bold', 'color': '#76c7c0'})
+                ], style={'width': '25%', 'text-align': 'center', 'display': 'inline-block'}),
+            ], style={'display': 'flex', 'justify-content': 'space-between', 'margin-top': '12px', 'width': '100%', 'height': '100px'}),
+
+            # Map
             html.Div([
                 dcc.Graph(id='map',
                           figure=px.scatter_mapbox(
                               [],
-                              zoom=6,
+                              zoom=8,
                               center={"lat": 42.81852, "lon": -1.64323},
-                              mapbox_style="open-street-map").update_layout(margin=dict(l=0, r=0, t=5, b=0)))
-            ], style={'height': '60%', "width": "100%"}),
+                              mapbox_style="open-street-map").update_layout(margin=dict(l=0, r=0, t=5, b=0)).update_mapboxes(pitch=0))
+            ], style={'height': '50%', "width": "100%", 'display': 'flex'}),
 
-            # Second section on the right-hand side (40% height)
+            # Timeseries plot with filled faded area
             html.Div([
                 dcc.Graph(id='timeseries', style={'height': '30vh'})
-            ], style={'height': '35%', 'margin-top': '12px'})
+            ], style={'height': '20%', 'margin-top': '12px', 'display': 'flex'})
 
-        ],
-            style={'width': '100%', 'display': 'inline-block', 'margin-left': '2%'})],
-        style={'display': 'flex', 'width': '100%'}),
+        ], style={'width': '70%', 'display': 'inline-block', 'padding': '20px', 'background-color': 'white'})
+    ], style={'display': 'flex', 'width': '100%'}),
 
     # Hidden store for intermediate results
     dcc.Store(id='simulation-data'),
     dcc.Store(id='area-data', data={}),
     dcc.Store(id='fire-data', data={}),
     dcc.Store(id='clicked-data', data=[]),
-])
+], style={'font-family': 'Arial'})
 
 
 # Play: Trigger loop
@@ -183,8 +185,10 @@ def animate_map(loop_step, fig, current_value, sim_data):
 
     sim_data = pd.DataFrame(sim_data)
     filtered_data = sim_data[sim_data['step_count'] == current_value]
-    fig = go.Figure(fig)
-    fig.update_traces(marker={"size": 10, "opacity": 0.6, "color": filtered_data["color"]})
+
+    if not filtered_data.empty:
+        fig = go.Figure(fig)
+        fig.data[-1].z = filtered_data["burning_value"]
 
     # Update value
     current_value += 1
@@ -241,7 +245,6 @@ def add_area(n_clicks, relayout_data, text, fig, area_data, table):
                         coordinates.append(coordinates[0])
 
                     area_data.update({f"Area_{ii + 1}": coordinates})
-                    print(coordinates)
 
                     # Add new trace for the shape
                     fig.add_trace(go.Scattermapbox(
@@ -354,7 +357,6 @@ def run_simulation(n_clicks, temperature, humidity, wind_speed, wind_direction, 
         forest_areas = []
         for name, this_area_data in area_data.items():
             poly = shapely.Polygon(this_area_data)
-            print(poly.area)
             this_area = {"name": name,
                          "area": poly,
                          "vegetation": [{"tree": "pine", "tree_density_m": 0.1}]}
@@ -372,7 +374,6 @@ def run_simulation(n_clicks, temperature, humidity, wind_speed, wind_direction, 
                                    humidity_conditions={"rain": False, "wet": False, "humidity": float(humidity)})
 
         forest_model.initialise_fire(fire_areas=fire_areas)
-        print(len(forest_model.tree_agents))
         results = forest_model.run_simulation(simulation_time=10)
         results["x"] = results["location"].apply(lambda x: x.x)
         results["y"] = results["location"].apply(lambda x: x.y)
@@ -380,12 +381,16 @@ def run_simulation(n_clicks, temperature, humidity, wind_speed, wind_direction, 
         results_plot = results.loc[results["step_count"] == 0, :]
 
         fig = go.Figure(fig)
-        fig.add_trace(go.Scattermapbox(
-            mode='markers',
-            lon=results_plot['x'],
+        fig.data = []
+        fig.add_trace(go.Densitymapbox(
             lat=results_plot['y'],
-            marker=dict(size=20, opacity=0.6, color=results_plot['color']),
-            name='Fire Spread'
+            lon=results_plot['x'],
+            z=results_plot['burning_value'],
+            zmin=0,
+            zmax=1,
+            radius=30,
+            opacity=0.8,
+            colorscale=custom_color_scale
         ))
 
         results = results.loc[:, ["x", "y", "burning_value", "color", "step_count"]].to_dict()
